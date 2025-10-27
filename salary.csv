@@ -1,0 +1,7 @@
+employee_id,employee_name,month,salary
+E001,John,2025-09,1500
+E002,Jane,2025-09,1800
+E003,Alex,2025-09,2000
+E001,John,2025-10,1500
+E002,Jane,2025-10,1800
+E003,Alex,2025-10,2000
