@@ -1,71 +1,92 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <title>Employee Performance Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f5f5f5;
-      padding: 40px;
-    }
-    canvas {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Employee Salary vs Earned Ratio</h1>
-  <canvas id="ratioChart" width="800" height="400"></canvas>
-
-  <script>
-    async function loadData() {
-      const response = await fetch('performance.csv');
-      const text = await response.text();
-
-      const rows = text.trim().split('\n').slice(1); // skip header
-      const names = [];
-      const ratios = [];
-
-      rows.forEach(row => {
-        const [id, name, month, salary, earned, ratio] = row.split(',');
-        names.push(name);
-        ratios.push(parseFloat(ratio));
-      });
-
-      new Chart(document.getElementById('ratioChart'), {
-        type: 'bar',
-        data: {
-          labels: names,
-          datasets: [{
-            label: 'Salary to Earned Ratio (%)',
-            data: ratios,
-            backgroundColor: 'rgba(54,162,235,0.6)'
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: { display: true, text: 'Percentage (%)' }
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            title: {
-              display: true,
-              text: 'Monthly Performance Ratios'
-            }
-          }
+    <meta charset="utf-8">
+    <title>Employee Performance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
         }
-      });
-    }
 
-    loadData();
-  </script>
+        canvas {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Employee Salary vs Earned Ratio</h1>
+    <canvas id="ratioChart" width="800" height="400"></canvas>
+
+    <script>
+        const bgColors = ratios.map(r => r >= 100 ? 'rgba(75, 192, 75, 0.7)' : 'rgba(255, 99, 132, 0.7)');
+        async function loadData() {
+            const response = await fetch('performance.csv');
+            const text = await response.text();
+
+            const rows = text.trim().split('\n').slice(1); // skip header
+            const names = [];
+            const ratios = [];
+
+            rows.forEach(row => {
+                const [id, name, month, salary, earned, ratio] = row.split(',');
+                names.push(name);
+                ratios.push(parseFloat(ratio));
+            });
+
+            new Chart(document.getElementById('ratioChart'), {
+                type: 'bar',
+                data: {
+                    labels: names,
+                    datasets: [{
+                        label: 'Salary to Earned Ratio (%)',
+                        data: ratios,
+                        backgroundColor: bgColors
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Percentage (%)' },
+                            ticks: { stepSize: 50 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Monthly Earnings vs Salary Ratio' },
+                        annotation: {
+                            annotations: {
+                                baseline: {
+                                    type: 'line',
+                                    yMin: 100,
+                                    yMax: 100,
+                                    borderColor: 'red',
+                                    borderWidth: 2,
+                                    label: {
+                                        enabled: true,
+                                        content: 'Break-even (100%)',
+                                        position: 'end'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            });
+        }
+
+        loadData();
+    </script>
 </body>
+
 </html>
