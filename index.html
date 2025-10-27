@@ -27,7 +27,6 @@
     <canvas id="ratioChart" width="800" height="400"></canvas>
 
     <script>
-        const bgColors = ratios.map(r => r >= 100 ? 'rgba(75, 192, 75, 0.7)' : 'rgba(255, 99, 132, 0.7)');
         async function loadData() {
             const response = await fetch('performance.csv');
             const text = await response.text();
@@ -49,7 +48,7 @@
                     datasets: [{
                         label: 'Salary to Earned Ratio (%)',
                         data: ratios,
-                        backgroundColor: bgColors
+                        backgroundColor: 'rgba(54,162,235,0.6)'
                     }]
                 },
                 options: {
