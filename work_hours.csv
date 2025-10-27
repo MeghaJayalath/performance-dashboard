@@ -1,6 +1,6 @@
 employee_id,project,date,hours
 E001,Project A,2025-09-03,8
-E001,Project B,2025-09-04,6
+E001,Project B,2025-09-04,5
 E002,Project B,2025-09-02,9
 E002,Project C,2025-09-05,5
 E003,Project A,2025-09-01,10
