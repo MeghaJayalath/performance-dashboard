@@ -20,7 +20,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install pandas
+        run: |
+          pip install --upgrade pip
+          pip install pandas requests
 
       - name: Run calculation script
         run: python calculate_ratio.py
