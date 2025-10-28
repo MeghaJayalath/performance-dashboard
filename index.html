@@ -1,204 +1,347 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>Employee Performance Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    background: #f5f5f5;
-  }
-
-  h1 {
-    text-align: center;
-    margin: 20px 0;
-  }
-
-  #gridContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: 250px !important;
-    cursor: pointer;
-  }
-
-  /* Modal popup */
-  #modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-
-  #modalContent {
-    width: 90vw;
-    max-width: 900px;
-    height: 80vh;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  #modalClose {
-    align-self: flex-end;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-  }
-
-  #modal canvas {
-    flex: 1;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-</style>
-</head>
-<body>
-<h1>Employee Performance Dashboard</h1>
-<div id="gridContainer"></div>
-
-<!-- Modal for expanded chart -->
-<div id="modal">
-  <div id="modalContent">
-    <div id="modalClose">✖ Close</div>
-    <canvas id="modalChart"></canvas>
-  </div>
-</div>
-
-<script>
-async function loadData() {
-  const response = await fetch('performance.csv');
-  const text = await response.text();
-
-  const rows = text.trim().split('\n').slice(1);
-  const dataMap = {}; // { employee_name: {month1: ratio, month2: ratio,...} }
-  const monthsSet = new Set();
-
-  rows.forEach(row => {
-    const [id, name, month, salary, earned, ratio] = row.split(',');
-    monthsSet.add(month);
-    if (!dataMap[name]) dataMap[name] = {};
-    dataMap[name][month] = parseFloat(ratio);
-  });
-
-  const months = Array.from(monthsSet).sort();
-  const gridContainer = document.getElementById('gridContainer');
-
-  // Create a canvas per employee
-  Object.keys(dataMap).forEach(employee => {
-    const canvas = document.createElement('canvas');
-    gridContainer.appendChild(canvas);
-
-    const data = months.map(m => dataMap[employee][m] || 0);
-
-    const bgColors = data.map(r => r >= 100 ? 'green' : 'red');
-
-    const chart = new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels: months,
-        datasets: [{
-          label: employee,
-          data: data,
-          borderColor: 'blue',
-          backgroundColor: 'rgba(54,162,235,0.2)',
-          tension: 0.3,
-          fill: true,
-          pointBackgroundColor: bgColors
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: employee
-          },
-          legend: { display: false },
-        },
-        scales: {
-          y: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' } }
-        }
+  <head>
+    <meta charset="utf-8" />
+    <title>Zotizens Performance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      html,
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
       }
-    });
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background: #f5f5f5;
+      }
 
-    // Click to expand in modal
-    canvas.addEventListener('click', () => openModal(employee, data, months));
-  });
-}
+      h1 {
+        text-align: center;
+        margin: 20px 0;
+      }
 
-function openModal(employee, data, months) {
-  const modal = document.getElementById('modal');
-  modal.style.display = 'flex';
+      #gridContainer {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
 
-  const modalCanvas = document.getElementById('modalChart');
-  // Destroy previous chart if exists
-  if (modalCanvas.chart) modalCanvas.chart.destroy();
+      canvas {
+        width: 100% !important;
+        height: 300px !important;
+        cursor: pointer;
+      }
 
-  modalCanvas.chart = new Chart(modalCanvas, {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets: [{
-        label: employee,
-        data: data,
-        borderColor: 'blue',
-        backgroundColor: 'rgba(54,162,235,0.2)',
-        tension: 0.3,
-        fill: true,
-        pointBackgroundColor: data.map(r => r >= 100 ? 'green' : 'red')
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: { display: true, text: employee + ' - Expanded View' },
-        legend: { display: false },
-        annotation: {
-          annotations: {
-            baseline: {
-              type: 'line',
-              yMin: 100,
-              yMax: 100,
-              borderColor: 'red',
-              borderWidth: 2,
-              label: { enabled: true, content: 'Break-even (100%)', position: 'end' }
-            }
+      .chart-wrapper {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      #modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      #modalContent {
+        width: 90vw;
+        max-width: 900px;
+        height: 80vh;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #modalClose {
+        align-self: flex-end;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      #modal canvas {
+        flex: 1;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .error {
+        color: red;
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Zotizens Performance Dashboard</h1>
+    <div id="gridContainer"></div>
+
+    <div id="modal">
+      <div id="modalContent">
+        <div id="modalClose">✖ Close</div>
+        <canvas id="modalChart"></canvas>
+      </div>
+    </div>
+
+    <script>
+      async function loadData() {
+        try {
+          const response = await fetch("performance.csv");
+          if (!response.ok) {
+            throw new Error("Could not load performance.csv");
           }
+          const csvText = await response.text();
+
+          const rows = csvText.trim().split("\n");
+          const headers = rows[0].split(",");
+          const dataRows = rows.slice(1);
+
+          const employeeData = {};
+          const monthsSet = new Set();
+
+          dataRows.forEach((row) => {
+            const values = row.split(",");
+            const employeeName = values[1];
+            const month = values[2];
+            const salary = parseFloat(values[3]);
+            const earned = parseFloat(values[4]);
+            const hours = parseFloat(values[5] || 0);
+            const ratio = parseFloat(values[6]);
+
+            if (!employeeData[employeeName]) {
+              employeeData[employeeName] = [];
+            }
+
+            employeeData[employeeName].push({
+              month,
+              ratio,
+              earned,
+              salary,
+              hours,
+            });
+
+            monthsSet.add(month);
+          });
+
+          const months = Array.from(monthsSet).sort();
+          const gridContainer = document.getElementById("gridContainer");
+
+          Object.keys(employeeData)
+            .sort()
+            .forEach((employee) => {
+              const wrapper = document.createElement("div");
+              wrapper.className = "chart-wrapper";
+              const canvas = document.createElement("canvas");
+              wrapper.appendChild(canvas);
+              gridContainer.appendChild(wrapper);
+
+              const empMonthData = {};
+              employeeData[employee].forEach((entry) => {
+                empMonthData[entry.month] = entry;
+              });
+
+              const ratios = months.map((m) => empMonthData[m]?.ratio || 0);
+              const bgColors = ratios.map((r) => (r >= 1 ? "green" : "red"));
+
+              const chart = new Chart(canvas, {
+                type: "line",
+                data: {
+                  labels: months,
+                  datasets: [
+                    {
+                      label: employee,
+                      data: ratios,
+                      borderColor: "blue",
+                      backgroundColor: "rgba(54,162,235,0.2)",
+                      tension: 0.3,
+                      fill: {
+                        target: { value: 1.0 },
+                        above: "rgba(0,255,0,0.1)",
+                        below: "rgba(255,0,0,0.1)",
+                      },
+                      pointBackgroundColor: bgColors,
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: employee,
+                    },
+                    legend: { display: false },
+                    tooltip: {
+                      callbacks: {
+                        label: (context) => {
+                          const month = months[context.dataIndex];
+                          const data = empMonthData[month];
+                          if (!data)
+                            return `Ratio (Earned/Salary): ${context.parsed.y.toFixed(
+                              2
+                            )}`;
+                          return [
+                            `Ratio (Earned/Salary): ${context.parsed.y.toFixed(
+                              2
+                            )}`,
+                            `Earned: Rs.${data.earned.toFixed(2)}`,
+                            `Salary: Rs.${data.salary.toFixed(2)}`,
+                            `Hours: ${data.hours.toFixed(1)}`,
+                          ];
+                        },
+                      },
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: false,
+                      grace: "10%",
+                      title: {
+                        display: true,
+                        text: "Earnings / Salary",
+                      },
+                      grid: {
+                        color: (context) =>
+                          context.tick.value === 1 ? "black" : "#ddd",
+                        lineWidth: (context) =>
+                          context.tick.value === 1 ? 2 : 1,
+                        borderDash: (context) =>
+                          context.tick.value === 1 ? [6, 6] : [],
+                      },
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: "Month",
+                      },
+                      ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                      },
+                    },
+                  },
+                },
+              });
+
+              canvas.addEventListener("click", () =>
+                openModal(employee, ratios, months, empMonthData)
+              );
+            });
+        } catch (error) {
+          document.getElementById(
+            "gridContainer"
+          ).innerHTML = `<div class="error">Error loading performance.csv: ${error.message}<br><br>
+                    Please run: <code>python calculate_ratio.py</code> to generate the file.</div>`;
         }
-      },
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' } }
       }
-    }
-  });
-}
 
-// Close modal
-document.getElementById('modalClose').addEventListener('click', () => {
-  document.getElementById('modal').style.display = 'none';
-});
+      function openModal(employee, ratios, months, empMonthData) {
+        const modal = document.getElementById("modal");
+        modal.style.display = "flex";
 
-loadData();
-</script>
-</body>
+        const modalCanvas = document.getElementById("modalChart");
+        if (modalCanvas.chart) modalCanvas.chart.destroy();
+
+        modalCanvas.chart = new Chart(modalCanvas, {
+          type: "line",
+          data: {
+            labels: months,
+            datasets: [
+              {
+                label: employee,
+                data: ratios,
+                borderColor: "blue",
+                backgroundColor: "rgba(54,162,235,0.2)",
+                tension: 0.3,
+                fill: {
+                  target: { value: 1.0 },
+                  above: "rgba(0,255,0,0.1)",
+                  below: "rgba(255,0,0,0.1)",
+                },
+                pointBackgroundColor: ratios.map((r) =>
+                  r >= 1 ? "green" : "red"
+                ),
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: { display: true, text: employee + " - Expanded View" },
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const month = months[context.dataIndex];
+                    const data = empMonthData[month];
+                    if (!data) return `Ratio: ${context.parsed.y.toFixed(2)}`;
+                    return [
+                      `Ratio (Earned/Salary): ${context.parsed.y.toFixed(2)}`,
+                      `Earned: Rs.${data.earned.toFixed(2)}`,
+                      `Salary: Rs.${data.salary.toFixed(2)}`,
+                      `Hours: ${data.hours.toFixed(1)}`,
+                    ];
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                grace: "10%",
+                title: {
+                  display: true,
+                  text: "Earnings / Salary",
+                },
+                grid: {
+                  color: (context) =>
+                    context.tick.value === 1 ? "black" : "#ddd",
+                  lineWidth: (context) => (context.tick.value === 1 ? 2 : 1),
+                  borderDash: (context) =>
+                    context.tick.value === 1 ? [6, 6] : [],
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Month",
+                },
+                ticks: {
+                  maxRotation: 45,
+                  minRotation: 45,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      document.getElementById("modalClose").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "none";
+      });
+
+      loadData();
+    </script>
+  </body>
 </html>

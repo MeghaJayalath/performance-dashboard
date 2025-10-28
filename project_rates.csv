@@ -1,4 +1,37 @@
-project,hourly_rate
-Project A,25
-Project B,40
-Project C,30
+project_id,project_name,hourly_rate
+652568df24407e66427a657b,Admin,2000
+65269f511b87f6658705a474,Admin_ITFacultyProjects,2000
+66f20b2ce2de7b61568177a6,Asset Shield,2000
+67570ba0a824ed361f7a6bf9,CareJetty,2000
+68beceda8f35600e0f52407c,Ceylon Meditrails,2000
+65218001894cd94491d28ab3,Coachello,2000
+6521837a3ec2cb252c5f0e09,EffortAgent,2000
+66a8d1ab7d094a5c8cec14bc,Effortless,2000
+65cc344a1f40b27125216652,Engineering,2000
+67dbe9a3bd8ac464accb2ffe,Famous AI,2000
+652569694004e52e0fad285b,Finance,2000
+68a56d89b968421b4ca43005,Gemaro,2000
+65bf537677682a2076866451,Hitech Connect,2000
+658f95fd3114da6b6f141e76,Ikman Web Crawler,2000
+6625f0bb5d9896471167ead1,Internal Projects,2000
+68f710ea29a7d13415c5ca31,LearnOne,2000
+66d12c1bedc49436ba9f6274,Legal & Secretarial work,2000
+67c036bcde3acb4fa3ba6e38,Lexigram,2000
+65218369894cd94491d2a0a2,Lift,2000
+65217f80e5c62943e1ba85c6,Lingotrek,2000
+65531363a9449d2ba82e594a,Marketting,2000
+68de09f6ce61e21ef02b0f92,Medichive,2000
+65217f76a50cf9664663afc3,Netzee,2000
+67e130b5ae394c4375f44972,Project Management,2000
+652183fba50cf9664663cd14,Rhisa,2000
+652183723ec2cb252c5f0dbb,Routesonar,2000
+66d26a2fedc49436bac47d54,SR-Qbank,2000
+6732dee31b009e148da35c32,SRM Management System,2000
+654bb49f73181d1c06d362f5,Sales,2000
+6571eaf5b291dc569a356fc8,Stargate,2000
+652183eda50cf9664663ccda,StudyReserve,2000
+682db3f0d7ce797b22aa2745,Unbranded LK,2000
+6714a2ea90254d10ca705eec,Vellar Tech,2000
+659b65d883e8651e8cf41bb4,ZOT HR,2000
+68ae9e2a0e25e33d3a0fab86,Zotizens,2000
+68b038fa777c8a23e067850f,trace,2000
